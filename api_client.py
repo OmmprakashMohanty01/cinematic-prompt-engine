@@ -40,3 +40,32 @@ class LLMService:
             raise Exception(
                 f"Failed to send prompt. Status code: {response.status_code}"
             )
+
+
+class LLMModel:
+    def __init__(self, model_name):
+        """
+        Initialize the LLMModel class with model information.
+
+        Args:
+            model_name (str): The name of the LLM model.
+        """
+        self.model_name = model_name
+
+    def get_model_description(self):
+        """
+        Get a description of the LLM model.
+
+        Returns:
+            str: The description of the LLM model.
+        """
+        params = {"model_name": self.model_name, "api_key": self.api_key}
+
+        response = requests.get(f"{self.api_url}/models", params=params)
+
+        if response.status_code == 200:
+            return response.json()["description"]
+        else:
+            raise Exception(
+                f"Failed to get model description. Status code: {response.status_code}"
+            )
