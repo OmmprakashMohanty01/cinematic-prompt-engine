@@ -69,3 +69,19 @@ class LLMModel:
             raise Exception(
                 f"Failed to get model description. Status code: {response.status_code}"
             )
+
+
+class LLMServiceResponse:
+    def __init__(self, response_text):
+        self.response_text = response_text
+
+    def as_json(self):
+        try:
+            return json.loads(self.response_text)
+        except json.JSONDecodeError:
+            return {}
+
+    def get_output_text(self):
+        if self.as_json().get("output"):
+            return self.as_json()["output"]
+        return ""
