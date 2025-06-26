@@ -141,3 +141,60 @@ def get_model_info(model_name, api_client):
         if model["model_name"] == model_name:
             return model
     raise Exception(f"Model '{model_name}' not found")
+
+
+class TextGenerationResult:
+    def __init__(self, model_name, generated_text):
+        """
+        Initialize the TextGenerationResult class.
+
+        Args:
+            model_name (str): The name of the LLM model that generated the text.
+            generated_text (str): The generated text.
+        """
+        self.model_name = model_name
+        self.generated_text = generated_text
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "generated_text": self.generated_text,
+        }
+
+
+class LLMServiceResult:
+    def __init__(self, api_client, prompt, response):
+        """
+        Initialize the LLMServiceResult class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            prompt (str): The original prompt sent to the LLM API.
+            response (str): The response from the LLM API.
+        """
+        self.api_client = api_client
+        self.prompt = prompt
+        self.response = response
+
+    def get_result(self):
+        try:
+            result = LLMServiceResponse(self.response).as_json()
+            return TextGenerationResult(
+                self.api_client.model_name, result.get("output", "")
+            )
+        except Exception as e:
+            return f"Failed to generate text: {str(e)}"
+
+    def as_dict(self):
+        return {
+            "prompt": self.prompt,
+            "result": self.get_result().as_dict(),
+        }
+
+
+def get_results(api_client, prompts):
+    results = []
+    for prompt in prompts:
+        response = api_client.send_prompt(prompt)
+        results.append(LLMServiceResult(api_client, prompt, response))
+    return results
