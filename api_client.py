@@ -85,3 +85,9 @@ class LLMServiceResponse:
         if self.as_json().get("output"):
             return self.as_json()["output"]
         return ""
+
+
+def get_model_output(self, prompt):
+    response = self.send_prompt(prompt)
+    output_response = LLMServiceResponse(response)
+    return output_response.get_output_text()
