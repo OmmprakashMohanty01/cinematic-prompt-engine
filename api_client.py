@@ -91,3 +91,53 @@ def get_model_output(self, prompt):
     response = self.send_prompt(prompt)
     output_response = LLMServiceResponse(response)
     return output_response.get_output_text()
+
+
+class LLMModelCatalog:
+    def __init__(self, api_url, api_key):
+        """
+        Initialize the LLMModelCatalog class with API information.
+
+        Args:
+            api_url (str): The URL of the API.
+            api_key (str): The API key for authentication.
+        """
+        self.api_url = api_url
+        self.api_key = api_key
+
+    def get_model_list(self):
+        """
+        Get a list of available LLM models.
+
+        Returns:
+            list: The list of available LLM models.
+        """
+        params = {"api_key": self.api_key}
+
+        response = requests.get(f"{self.api_url}/models", params=params)
+
+        if response.status_code == 200:
+            return response.json()["models"]
+        else:
+            raise Exception(
+                f"Failed to get model list. Status code: {response.status_code}"
+            )
+
+
+class LLMModelInfo:
+    def __init__(self, model_info_json):
+        self.model_info_json = model_info_json
+
+    def get_model_name(self):
+        return self.model_info_json["model_name"]
+
+    def get_model_description(self):
+        return self.model_info_json["description"]
+
+
+def get_model_info(model_name, api_client):
+    response = api_client.get_model_list()
+    for model in response:
+        if model["model_name"] == model_name:
+            return model
+    raise Exception(f"Model '{model_name}' not found")
