@@ -50,3 +50,21 @@ subject = (
 print(
     inject_lighting_camera_rendering_base(subject, lighting, camera_angles, rendering)
 )
+
+
+def inject_animation(base_subject: str, animation: Dict) -> str:
+    if not animation:
+        return base_subject
+
+    injected_base = base_subject
+    injections = {
+        "a": "animation = {}",
+        "a_": f'{{"duration": {animation["duration"]}, "frames_per_second": {animation["frames_per_second"]}}}',
+    }
+    for key, value in injections.items():
+        if key != "a_":
+            inject = "{" + key + "} = {}"
+        else:
+            inject = key + "=" + value
+        injected_base += "\n" + inject.format(animation[key])
+    return injected_base
