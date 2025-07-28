@@ -198,3 +198,56 @@ def get_results(api_client, prompts):
         response = api_client.send_prompt(prompt)
         results.append(LLMServiceResult(api_client, prompt, response))
     return results
+
+
+class ImageGenerationResult:
+    def __init__(self, model_name, generated_image_url):
+        """
+        Initialize the ImageGenerationResult class.
+
+        Args:
+            model_name (str): The name of the LLM model that generated the image.
+            generated_image_url (str): The URL of the generated image.
+        """
+        self.model_name = model_name
+        self.generated_image_url = generated_image_url
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "generated_image_url": self.generated_image_url,
+        }
+
+
+class ImageGenerationResultAPI:
+    def __init__(self, api_client, image_url):
+        """
+        Initialize the ImageGenerationResult class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            image_url (str): The URL of the generated image.
+        """
+        self.api_client = api_client
+        self.image_url = image_url
+
+    def get_result(self):
+        try:
+            result = ImageGenerationResult(self.api_client.model_name, self.image_url)
+            return result
+        except Exception as e:
+            return f"Failed to generate image: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_image_results(api_client, image_prompts):
+    results = []
+    for image_prompt in image_prompts:
+        response = api_client.send_prompt(image_prompt)
+        image_url = response.get("generated_image", "")
+        results.append(ImageGenerationResultAPI(api_client, image_url))
+    return results
