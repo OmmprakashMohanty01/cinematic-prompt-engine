@@ -68,3 +68,55 @@ def inject_animation(base_subject: str, animation: Dict) -> str:
             inject = key + "=" + value
         injected_base += "\n" + inject.format(animation[key])
     return injected_base
+
+
+def inject_sound(
+    base_subject: str, sound: Dict, sound_effects=None, volume=None
+) -> str:
+    injected_base = base_subject
+    injections = {
+        "s": "sound = {}",
+        "s_": f'{{"source": "{sound["source"]}", "type": "{sound["type"]}"}},',
+        "sf": "sound_effects = {}",
+        "sf_": f'{{"type": "{sound_effects["type"]["sf"]}", "duration": {sound_effects["duration"]}}}',
+        "v": "volume = {}",
+        "v_": f'{{"master_volume": {volume["master_volume"]}, "sound_volume": {volume["sound_volume"]}}}',
+    }
+    for key, value in injections.items():
+        if key != "s_":
+            inject = "{" + key + "} = {}"
+        elif key != "sf_":
+            inject = "{" + key + "}" + value
+        else:
+            inject = f"  {injections[key]}"
+            if "sf" in sound_effects:
+                injected_base += inject.format(injections["sf_"])
+        if key in sound:
+            injected_base += "\n" + inject.format(sound[key])
+    return injected_base
+
+
+sound = {
+    "source": "engine",
+    "type": "dynamic",
+    "pitch": 1.2,
+    "volume": 0.8,
+    "frequency": 500,
+}
+sound_effects = {
+    "type": {"sf": "explosion"},
+    "duration": 2,
+    "volume": 1.0,
+    "pitch": 2.0,
+}
+volume = {
+    "master_volume": 0.7,
+    "sound_volume": 0.9,
+}
+subject = (
+    "A game with engine sound, dynamic type, "
+    "pitch: 1.2, volume: 0.8, frequency: 500 Hz, "
+    "with explosion sound effect, duration: 2 seconds, "
+    "pitch: 2.0, volume: 1.0, and with master volume: 0.7 and sound volume: 0.9."
+)
+print(inject_sound(subject, sound, sound_effects, volume))
