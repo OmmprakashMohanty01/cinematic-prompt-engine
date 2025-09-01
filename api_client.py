@@ -251,3 +251,27 @@ def get_image_results(api_client, image_prompts):
         image_url = response.get("generated_image", "")
         results.append(ImageGenerationResultAPI(api_client, image_url))
     return results
+
+
+class LLMServiceError(Exception):
+    """
+    Custom exception class for LLMService related errors.
+    """
+
+    pass
+
+
+class ModelNotFoundError(LLMServiceError):
+    """
+    Custom exception class for when a model is not found.
+    """
+
+    pass
+
+
+class APIConnectionError(LLMServiceError):
+    """
+    Custom exception class for when there is a problem with the API connection.
+    """
+
+    pass
