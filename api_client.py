@@ -275,3 +275,66 @@ class APIConnectionError(LLMServiceError):
     """
 
     pass
+
+
+class TextCompletionResult:
+    def __init__(self, model_name, completion_text):
+        """
+        Initialize the TextCompletionResult class.
+
+        Args:
+            model_name (str): The name of the LLM model that generated the text.
+            completion_text (str): The completed text.
+        """
+        self.model_name = model_name
+        self.completion_text = completion_text
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "completion_text": self.completion_text,
+        }
+
+
+class TextCompletionResultAPI:
+    def __init__(self, api_client, completion_text):
+        """
+        Initialize the TextCompletionResult class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            completion_text (str): The completed text.
+        """
+        self.api_client = api_client
+        self.completion_text = completion_text
+
+    def get_result(self):
+        try:
+            result = TextCompletionResult(
+                self.api_client.model_name, self.completion_text
+            )
+            return result
+        except Exception as e:
+            return f"Failed to generate text: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_completion_results(api_client, completion_prompts):
+    results = []
+    for prompt in completion_prompts:
+        response = api_client.send_prompt(prompt)
+        completion_response = {
+            "completion_response": LLMServiceResponse(response)
+            .as_json()
+            .get("completion_text", "")
+        }
+        results.append(
+            TextCompletionResultAPI(
+                api_client, completion_response["completion_response"]
+            )
+        )
+    return results
