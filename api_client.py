@@ -338,3 +338,49 @@ def get_completion_results(api_client, completion_prompts):
             )
         )
     return results
+
+
+class TranslationResult:
+    def __init__(self, model_name, translated_text):
+        self.model_name = model_name
+        self.translated_text = translated_text
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "translated_text": self.translated_text,
+        }
+
+
+class TranslationResultAPI:
+    def __init__(self, api_client, translated_text):
+        self.api_client = api_client
+        self.translated_text = translated_text
+
+    def get_result(self):
+        try:
+            result = TranslationResult(self.api_client.model_name, self.translated_text)
+            return result
+        except Exception as e:
+            return f"Failed to translate text: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_translation_results(api_client, translation_prompts):
+    results = []
+    for prompt in translation_prompts:
+        response = api_client.send_prompt(prompt)
+        params = {"input_text": response, "model_name": api_client.model_name}
+        response = requests.post(f"{api_client.api_url}/translate", params=params)
+        if response.status_code == 200:
+            result = TranslationResultAPI(api_client, response.text)
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to translate text. Status code: {response.status_code}"
+            )
+    return results
