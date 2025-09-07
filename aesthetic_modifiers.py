@@ -27,3 +27,21 @@ def calculate_aesthetic_overrides(aesthetic_name1, aesthetic_name2):
     return 1.0 / (
         calculate_modifier(aesthetic_name1) / calculate_modifier(aesthetic_name2)
     )
+
+
+def load_aesthetic_overrides(filename):
+    try:
+        with open(filename, "r") as file:
+            data = file.read()
+            override_map = {}
+            for line in data.splitlines():
+                if line.startswith("#"):
+                    continue
+                key, value = line.split("=")
+                key = key.strip()
+                value = float(value.strip())
+                override_map[key] = value
+            return override_map
+    except FileNotFoundError:
+        print("File not found. Using default aesthetic overrides.")
+        return {}
