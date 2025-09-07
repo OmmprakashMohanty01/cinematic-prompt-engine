@@ -120,3 +120,42 @@ subject = (
     "pitch: 2.0, volume: 1.0, and with master volume: 0.7 and sound volume: 0.9."
 )
 print(inject_sound(subject, sound, sound_effects, volume))
+
+
+def inject_terrain(
+    base_subject: str, terrain: Dict, elevation: Dict = None, grass=None
+) -> str:
+    injected_base = base_subject
+    injections = {
+        "t": "terrain = {}",
+        "t_": f'{{"height": {terrain["height"]}, "material": "{terrain["material"]}"}},',
+        "e": "elevation = {}",
+        "e_": f'{{"min": {elevation["min"]}, "max": {elevation["max"]}}}',
+        "g": "grass = {}",
+        "g_": f'{{"color": "{grass["color"]}", "length": {grass["length"]}}}',
+    }
+    for key, value in injections.items():
+        if key != "t_":
+            inject = "{" + key + "} = {}"
+        else:
+            inject = key + "=" + value
+        if key in terrain:
+            injected_base += "\n" + inject.format(terrain[key])
+    if "e_" in elevation:
+        injected_base += "\n" + injections["e_"]
+    if "g_" in grass:
+        injected_base += "\n" + injections["g_"]
+    return injected_base
+
+
+terrain = {
+    "height": 0.8,
+    "material": "dirt",
+}
+elevation = {"min": -0.5, "max": 0.2}
+grass = {"color": "green", "length": 0.5}
+subject = (
+    "A game with terrain height of 0.8, material of dirt, "
+    "elevation min: -0.5 and max: 0.2, and with grass color of green and length of 0.5."
+)
+print(inject_terrain(subject, terrain, elevation, grass))
