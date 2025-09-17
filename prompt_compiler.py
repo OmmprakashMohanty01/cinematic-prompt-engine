@@ -159,3 +159,37 @@ subject = (
     "elevation min: -0.5 and max: 0.2, and with grass color of green and length of 0.5."
 )
 print(inject_terrain(subject, terrain, elevation, grass))
+
+
+import logging
+from typing import Dict
+
+logger = logging.getLogger(__name__)
+
+
+def inject_weather(base_subject: str, weather: Dict) -> str:
+    injected_base = base_subject
+    injections = {
+        "w": "weather = {}",
+        "w_": f'{{"type": "{weather["type"]}", "temperature": {weather["temperature"]}, "humidity": {weather["humidity"]}, "wind_speed": {weather["wind_speed"]}}}',
+    }
+    for key, value in injections.items():
+        if key != "w_":
+            inject = "{" + key + "} = {}"
+        else:
+            inject = key + "=" + value
+        injected_base += "\n" + inject.format(weather[key])
+    return injected_base
+
+
+weather = {
+    "type": "rainy",
+    "temperature": 15,
+    "humidity": 0.8,
+    "wind_speed": 10,
+}
+subject = (
+    "A game with rainy weather, temperature of 15, "
+    "humidity of 0.8 and wind speed of 10."
+)
+print(inject_weather(subject, weather))
