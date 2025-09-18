@@ -384,3 +384,107 @@ def get_translation_results(api_client, translation_prompts):
                 f"Failed to translate text. Status code: {response.status_code}"
             )
     return results
+
+
+class ConversationResult:
+    def __init__(self, model_name, conversation_history):
+        self.model_name = model_name
+        self.conversation_history = conversation_history
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "conversation_history": self.conversation_history,
+        }
+
+
+class ConversationResultAPI:
+    def __init__(self, api_client, conversation_history):
+        self.api_client = api_client
+        self.conversation_history = conversation_history
+
+    def get_result(self):
+        try:
+            result = ConversationResult(
+                self.api_client.model_name, self.conversation_history
+            )
+            return result
+        except Exception as e:
+            return f"Failed to generate conversation history: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_conversation_results(api_client, conversation_prompts):
+    results = []
+    for prompt in conversation_prompts:
+        response = api_client.send_prompt(prompt)
+        response_json = LLMServiceResponse(response).as_json()
+        if response_json.get("nextPrompt"):
+            next_prompt = response_json["nextPrompt"]
+            conversation_history = response_json.get("conversation_history", [])
+            response = requests.post(
+                f"{api_client.api_url}/conversation", json={"prompt": next_prompt}
+            )
+            if response.status_code == 200:
+                result_json = response.json()
+                conversation_history.append(
+                    f"{response_json['userInput']} - {response_json['assistantResponse']}"
+                )
+                conversation_history.append(
+                    f"{next_prompt} - {result_json.get('assistantResponse', '')}"
+                )
+                result = ConversationResultAPI(api_client, conversation_history)
+                results.append(result.as_dict())
+            else:
+                raise Exception(
+                    f"Failed to continue conversation. Status code: {response.status_code}"
+                )
+        else:
+            raise Exception(f"Conversation has ended.")
+    return results
+
+
+class ModelListResult:
+    def __init__(self, models):
+        self.models = models
+
+    def as_dict(self):
+        return {
+            "models": self.models,
+        }
+
+
+class ModelListResultAPI:
+    def __init__(self, models):
+        self.models = models
+
+    def get_result(self):
+        try:
+            result = ModelListResult(self.models)
+            return result
+        except Exception as e:
+            return f"Failed to retrieve model list: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        return result
+
+
+def get_model_list(api_client):
+    response = requests.get(f"{api_client.api_url}/models")
+    if response.status_code == 200:
+        try:
+            result = response.json()
+            return ModelListResultAPI(result["models"])
+        except json.JSONDecodeError:
+            raise Exception(
+                f"Failed to decode model list. Status code: {response.status_code}"
+            )
+    else:
+        raise Exception(
+            f"Failed to retrieve model list. Status code: {response.status_code}"
+        )
