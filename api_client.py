@@ -488,3 +488,44 @@ def get_model_list(api_client):
         raise Exception(
             f"Failed to retrieve model list. Status code: {response.status_code}"
         )
+
+
+class ModelStatusResult:
+    def __init__(self, model_name, status):
+        self.model_name = model_name
+        self.status = status
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "status": self.status,
+        }
+
+
+class ModelStatusResultAPI:
+    def __init__(self, model_name, status_url):
+        self.model_name = model_name
+        self.status_url = status_url
+
+    def get_result(self):
+        try:
+            result = ModelStatusResult(self.model_name, None)
+            return result
+        except Exception as e:
+            return f"Failed to retrieve model status: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["status_url"] = self.status_url
+        return result
+
+
+def get_model_status(api_client, model_name):
+    response = requests.get(f"{api_client.api_url}/models/{model_name}/status")
+    if response.status_code == 200:
+        result = ModelStatusResultAPI(model_name, response.url)
+        return result.as_dict()
+    else:
+        raise Exception(
+            f"Failed to retrieve model status. Status code: {response.status_code}"
+        )
