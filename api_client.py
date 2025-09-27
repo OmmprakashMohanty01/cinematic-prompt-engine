@@ -529,3 +529,125 @@ def get_model_status(api_client, model_name):
         raise Exception(
             f"Failed to retrieve model status. Status code: {response.status_code}"
         )
+
+
+class TextSimilarityResult:
+    def __init__(self, model_name, similarity_percentage):
+        """
+        Initialize the TextSimilarityResult class.
+
+        Args:
+            model_name (str): The name of the LLM model used to calculate similarity.
+            similarity_percentage (float): The percentage of similarity between two texts.
+        """
+        self.model_name = model_name
+        self.similarity_percentage = similarity_percentage
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "similarity_percentage": self.similarity_percentage,
+        }
+
+
+class TextSimilarityResultAPI:
+    def __init__(self, api_client, similarity_percentage):
+        """
+        Initialize the TextSimilarityResultAPI class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            similarity_percentage (float): The percentage of similarity between two texts.
+        """
+        self.api_client = api_client
+        self.similarity_percentage = similarity_percentage
+
+    def get_result(self):
+        try:
+            result = TextSimilarityResult(
+                self.api_client.model_name, self.similarity_percentage
+            )
+            return result
+        except Exception as e:
+            return f"Failed to calculate similarity: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_text_similarity_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(f"{api_client.api_url}/text_similarity", params=params)
+        if response.status_code == 200:
+            result = TextSimilarityResultAPI(api_client, response.json()["similarity"])
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to calculate text similarity. Status code: {response.status_code}"
+            )
+    return results
+
+
+class KeywordExtractionResult:
+    def __init__(self, model_name, keywords):
+        """
+        Initialize the KeywordExtractionResult class.
+
+        Args:
+            model_name (str): The name of the LLM model used to extract keywords.
+            keywords (list): A list of extracted keywords.
+        """
+        self.model_name = model_name
+        self.keywords = keywords
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "keywords": self.keywords,
+        }
+
+
+class KeywordExtractionResultAPI:
+    def __init__(self, api_client, keywords):
+        """
+        Initialize the KeywordExtractionResultAPI class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            keywords (list): A list of extracted keywords.
+        """
+        self.api_client = api_client
+        self.keywords = keywords
+
+    def get_result(self):
+        try:
+            result = KeywordExtractionResult(self.api_client.model_name, self.keywords)
+            return result
+        except Exception as e:
+            return f"Failed to extract keywords: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_keyword_extraction_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/keyword_extraction", params=params
+        )
+        if response.status_code == 200:
+            result = KeywordExtractionResultAPI(api_client, response.json()["keywords"])
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to extract keywords. Status code: {response.status_code}"
+            )
+    return results
