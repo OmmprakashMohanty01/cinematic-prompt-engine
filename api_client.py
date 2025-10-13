@@ -651,3 +651,68 @@ def get_keyword_extraction_results(api_client, texts):
                 f"Failed to extract keywords. Status code: {response.status_code}"
             )
     return results
+
+
+class SentimentAnalysisResult:
+    def __init__(self, model_name, sentiment_score):
+        """
+        Initialize the SentimentAnalysisResult class.
+
+        Args:
+            model_name (str): The name of the LLM model used to analyze sentiment.
+            sentiment_score (float): The sentiment score of the input text.
+        """
+        self.model_name = model_name
+        self.sentiment_score = sentiment_score
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "sentiment_score": self.sentiment_score,
+        }
+
+
+class SentimentAnalysisResultAPI:
+    def __init__(self, api_client, sentiment_score):
+        """
+        Initialize the SentimentAnalysisResultAPI class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            sentiment_score (float): The sentiment score of the input text.
+        """
+        self.api_client = api_client
+        self.sentiment_score = sentiment_score
+
+    def get_result(self):
+        try:
+            result = SentimentAnalysisResult(
+                self.api_client.model_name, self.sentiment_score
+            )
+            return result
+        except Exception as e:
+            return f"Failed to analyze sentiment: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_sentiment_analysis_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/sentiment_analysis", params=params
+        )
+        if response.status_code == 200:
+            result = SentimentAnalysisResultAPI(
+                api_client, response.json()["sentiment"]
+            )
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to analyze sentiment. Status code: {response.status_code}"
+            )
+    return results
