@@ -716,3 +716,68 @@ def get_sentiment_analysis_results(api_client, texts):
                 f"Failed to analyze sentiment. Status code: {response.status_code}"
             )
     return results
+
+
+class NamedEntityRecognitionResult:
+    def __init__(self, model_name, entities):
+        """
+        Initialize the NamedEntityRecognitionResult class.
+
+        Args:
+            model_name (str): The name of the LLM model used to extract entities.
+            entities (list): A list of extracted entities.
+        """
+        self.model_name = model_name
+        self.entities = entities
+
+    def as_dict(self):
+        return {
+            "model": self.model_name,
+            "entities": self.entities,
+        }
+
+
+class NamedEntityRecognitionResultAPI:
+    def __init__(self, api_client, entities):
+        """
+        Initialize the NamedEntityRecognitionResultAPI class.
+
+        Args:
+            api_client (LLMService): The api client instance.
+            entities (list): A list of extracted entities.
+        """
+        self.api_client = api_client
+        self.entities = entities
+
+    def get_result(self):
+        try:
+            result = NamedEntityRecognitionResult(
+                self.api_client.model_name, self.entities
+            )
+            return result
+        except Exception as e:
+            return f"Failed to extract entities: {str(e)}"
+
+    def as_dict(self):
+        result = self.get_result().as_dict()
+        result["prompt"] = self.api_client.prompt
+        return result
+
+
+def get_named_entity_recognition_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/named_entity_recognition", params=params
+        )
+        if response.status_code == 200:
+            result = NamedEntityRecognitionResultAPI(
+                api_client, response.json()["entities"]
+            )
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to extract entities. Status code: {response.status_code}"
+            )
+    return results
