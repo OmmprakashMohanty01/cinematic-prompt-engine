@@ -45,3 +45,12 @@ def load_aesthetic_overrides(filename):
     except FileNotFoundError:
         print("File not found. Using default aesthetic overrides.")
         return {}
+
+
+def save_aesthetic_overrides(filename, override_map):
+    try:
+        with open(filename, "w") as file:
+            for key, value in override_map.items():
+                file.write(f"{key}={value}\n")
+    except Exception as e:
+        print(f"Error saving aesthetic overrides: {str(e)}")
