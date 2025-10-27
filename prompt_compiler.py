@@ -193,3 +193,35 @@ subject = (
     "humidity of 0.8 and wind speed of 10."
 )
 print(inject_weather(subject, weather))
+
+
+import logging
+from typing import Dict
+
+
+logger = logging.getLogger(__name__)
+
+
+def inject_water(base_subject: str, water: Dict) -> str:
+    injected_base = base_subject
+    injections = {
+        "wa": "water = {}",
+        "wa_": f'{{"level": {water["level"]}, "texture": "{water["texture"]}", "flow_rate": {water["flow_rate"]}}}',
+    }
+    for key, value in injections.items():
+        if key != "wa_":
+            inject = "{" + key + "} = {}"
+        else:
+            inject = key + "=" + value
+        if key in water:
+            injected_base += "\n" + inject.format(water[key])
+    return injected_base
+
+
+water = {
+    "level": 0.5,
+    "texture": "wavy",
+    "flow_rate": 2,
+}
+subject = "A game with water level of 0.5, texture of wavy, and flow rate of 2."
+print(inject_water(subject, water))
