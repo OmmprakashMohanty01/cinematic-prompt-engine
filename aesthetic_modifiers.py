@@ -54,3 +54,8 @@ def save_aesthetic_overrides(filename, override_map):
                 file.write(f"{key}={value}\n")
     except Exception as e:
         print(f"Error saving aesthetic overrides: {str(e)}")
+
+
+def save_default_overrides(filename):
+    default_map = {"plot_size": 8.0, "point_color": 1.0, "label_size": 12.0}
+    save_aesthetic_overrides(filename, default_map)
