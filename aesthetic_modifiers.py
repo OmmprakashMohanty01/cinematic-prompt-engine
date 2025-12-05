@@ -59,3 +59,23 @@ def save_aesthetic_overrides(filename, override_map):
 def save_default_overrides(filename):
     default_map = {"plot_size": 8.0, "point_color": 1.0, "label_size": 12.0}
     save_aesthetic_overrides(filename, default_map)
+
+
+def load_default_overrides(filename):
+    try:
+        with open(filename, "r") as file:
+            default_map = {}
+            for line in file.read().splitlines():
+                if line.startswith("#"):
+                    continue
+                key, value = line.split("=")
+                key = key.strip()
+                value = float(value.strip())
+                default_map[key] = value
+            return default_map
+    except FileNotFoundError:
+        print("Default file not found. Using default aesthetic overrides.")
+        save_default_overrides(filename)
+        return load_default_overrides(filename)
+    except Exception as e:
+        print(f"Error loading default aesthetic overrides: {str(e)}")
