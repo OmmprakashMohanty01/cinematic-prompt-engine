@@ -798,3 +798,20 @@ def get_sentiment_analysis_results(api_client, texts):
                 f"Failed to extract sentiment. Status code: {response.status_code}"
             )
     return results
+
+
+def get_language_detection_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/language_detection", params=params
+        )
+        if response.status_code == 200:
+            result = LanguageDetectionResultAPI(response.json())
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to detect language. Status code: {response.status_code}"
+            )
+    return results
