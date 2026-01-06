@@ -105,3 +105,29 @@ def load_custom_overrides(filename):
     except FileNotFoundError:
         print("Custom file not found. Using default aesthetic overrides.")
         return load_default_overrides(filename)
+
+
+def save_default_overrides(filename, default_map):
+    try:
+        with open(filename, "w") as file:
+            for key, value in default_map.items():
+                file.write(f"{key} = {value}\n")
+    except Exception as e:
+        print(f"Error saving default aesthetic overrides: {str(e)}")
+
+
+def load_default_overrides(filename):
+    try:
+        with open(filename, "r") as file:
+            default_map = {}
+            for line in file.read().splitlines():
+                if line.startswith("#"):
+                    continue
+                key, value = line.split("=")
+                key = key.strip()
+                value = float(value.strip())
+                default_map[key] = value
+            return default_map
+    except FileNotFoundError:
+        default_default_map = {"map1": 1.0, "map2": 2.0}  # example default map
+        return default_default_map
