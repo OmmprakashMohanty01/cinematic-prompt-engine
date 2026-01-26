@@ -225,3 +225,31 @@ water = {
 }
 subject = "A game with water level of 0.5, texture of wavy, and flow rate of 2."
 print(inject_water(subject, water))
+
+
+from typing import Dict
+
+
+def extract_wood(base_subject: str, wood: Dict) -> str:
+    extracted_base = base_subject
+    extractions = {
+        "wh": "wood = {}",
+        "wh_": f'{{"density": {wood["density"]}, "grain": "{wood["grain"]}", "stability": {wood["stability"]}}}',
+    }
+    for key, value in extractions.items():
+        if key != "wh_":
+            extract = "{" + key + "} = {}"
+        else:
+            extract = key + "=" + value
+        if key in wood:
+            extracted_base += "\n" + extract.format(wood[key])
+    return extracted_base
+
+
+wood = {
+    "density": 0.7,
+    "grain": "smooth",
+    "stability": 3,
+}
+subject = "A game with wood density of 0.7 and grain of smooth, also stability of 3."
+print(extract_wood(subject, wood))
