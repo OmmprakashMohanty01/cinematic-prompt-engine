@@ -131,3 +131,17 @@ def load_default_overrides(filename):
     except FileNotFoundError:
         default_default_map = {"map1": 1.0, "map2": 2.0}  # example default map
         return default_default_map
+
+
+def load_specific_override(filename, key):
+    try:
+        with open(filename, "r") as file:
+            for line in file.read().splitlines():
+                if line.startswith("#"):
+                    continue
+                curr_key, value = line.split("=")
+                curr_key = curr_key.strip()
+                if curr_key == key:
+                    return float(value.strip())
+    except FileNotFoundError:
+        return None
