@@ -145,3 +145,21 @@ def load_specific_override(filename, key):
                     return float(value.strip())
     except FileNotFoundError:
         return None
+
+
+def load_specific_defaults_from_file(filename, defaults):
+    try:
+        override_found = False
+        with open(filename, "r") as file:
+            for line in file.read().splitlines():
+                if line.startswith("#"):
+                    continue
+                key, value = line.split("=")
+                key = key.strip()
+                if key in defaults:
+                    defaults[key] = float(value.strip())
+                    override_found = True
+            if not override_found:
+                return defaults
+    except FileNotFoundError:
+        return defaults
