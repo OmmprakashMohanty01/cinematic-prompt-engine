@@ -163,3 +163,10 @@ def load_specific_defaults_from_file(filename, defaults):
                 return defaults
     except FileNotFoundError:
         return defaults
+
+
+def write_specific_defaults_to_file(filename, defaults):
+    with open(filename, "w") as file:
+        file.write("\n# Aesthetic modifier defaults\n")
+        for key, value in defaults.items():
+            file.write(f"{key}={value}\n")
