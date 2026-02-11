@@ -170,3 +170,13 @@ def write_specific_defaults_to_file(filename, defaults):
         file.write("\n# Aesthetic modifier defaults\n")
         for key, value in defaults.items():
             file.write(f"{key}={value}\n")
+
+
+def load_specific_defaults_from_environment(defaults):
+    for key in defaults:
+        if key in os.environ:
+            try:
+                value = float(os.environ[key])
+                defaults[key] = value
+            except ValueError:
+                pass
