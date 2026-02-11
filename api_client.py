@@ -849,3 +849,20 @@ def get_sentiment_detection_results(api_client, texts):
                 f"Failed to detect sentiment. Status code: {response.status_code}"
             )
     return results
+
+
+def get_entity_recognition_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/entity_recognition", params=params
+        )
+        if response.status_code == 200:
+            result = EntityRecognitionResultAPI(response.json())
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to recognize entities. Status code: {response.status_code}"
+            )
+    return results
