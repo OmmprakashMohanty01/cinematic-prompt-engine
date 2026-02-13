@@ -883,3 +883,20 @@ def get_text_classification_results(api_client, texts):
                 f"Failed to classify text. Status code: {response.status_code}"
             )
     return results
+
+
+def get_sentiment_analysis_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/sentiment_analysis", params=params
+        )
+        if response.status_code == 200:
+            result = SentimentAnalysisResultAPI(response.json())
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to analyze sentiment. Status code: {response.status_code}"
+            )
+    return results
