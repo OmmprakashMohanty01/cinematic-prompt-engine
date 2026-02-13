@@ -180,3 +180,18 @@ def load_specific_defaults_from_environment(defaults):
                 defaults[key] = value
             except ValueError:
                 pass
+
+
+def load_specific_defaults_from_file(filename, defaults):
+    try:
+        with open(filename, "r") as file:
+            for line in file:
+                line = line.strip()
+                key, value = line.split("=")
+                if key in defaults:
+                    try:
+                        defaults[key] = float(value)
+                    except ValueError:
+                        pass
+    except FileNotFoundError:
+        pass
