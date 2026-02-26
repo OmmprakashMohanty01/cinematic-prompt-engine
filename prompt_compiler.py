@@ -253,3 +253,18 @@ wood = {
 }
 subject = "A game with wood density of 0.7 and grain of smooth, also stability of 3."
 print(extract_wood(subject, wood))
+
+
+def extract_sand(base_subject: str, sand: Dict) -> str:
+    extractions = {
+        "ps": f'{{"size": {sand["size"]}, "texture": "{sand["texture"]}", "conductivity": {sand["conductivity"]}}}',
+    }
+    extracted_sand = ""
+    for key, value in extractions.items():
+        if key in sand:
+            extracted_sand += "\n" + key + "=" + value
+    if extracted_sand:
+        extracted_base = base_subject
+        extracted_base += "\n Sand details: " + extracted_sand
+        return extracted_base
+    return base_subject
