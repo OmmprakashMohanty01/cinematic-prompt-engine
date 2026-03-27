@@ -951,3 +951,20 @@ def get_category_extraction_results(api_client, texts):
                 f"Failed to extract categories. Status code: {response.status_code}"
             )
     return results
+
+
+def get_entity_extraction_results(api_client, texts):
+    results = []
+    for text in texts:
+        params = {"input_text": text, "model_name": api_client.model_name}
+        response = requests.post(
+            f"{api_client.api_url}/entity_extraction", params=params
+        )
+        if response.status_code == 200:
+            result = EntityExtractionResultAPI(response.json())
+            results.append(result.as_dict())
+        else:
+            raise Exception(
+                f"Failed to extract entities. Status code: {response.status_code}"
+            )
+    return results
