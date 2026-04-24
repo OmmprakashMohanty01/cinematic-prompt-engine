@@ -268,3 +268,20 @@ def extract_sand(base_subject: str, sand: Dict) -> str:
         extracted_base += "\n Sand details: " + extracted_sand
         return extracted_base
     return base_subject
+
+
+def extract_stone(base_subject: str, stone: Dict) -> str:
+    extractions = {
+        "hardness": f'"{stone["hardness"]}"',
+        "color": f'"{stone["color"]}"',
+        "fissures": f'"{stone["fissures"]}"',
+    }
+    extracted_stone = ""
+    for key, value in extractions.items():
+        if key in stone:
+            extracted_stone += "\n" + key + "=" + value
+    if extracted_stone:
+        extracted_base = base_subject
+        extracted_base += "\n Stone details: " + extracted_stone
+        return extracted_base
+    return base_subject
