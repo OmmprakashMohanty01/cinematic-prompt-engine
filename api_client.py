@@ -378,7 +378,7 @@ def get_translation_results(api_client, translation_prompts):
         response = requests.post(f"{api_client.api_url}/translate", params=params)
         if response.status_code == 200:
             result = TranslationResultAPI(api_client, response.text)
-            results.append(result.as_dict())
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to translate text. Status code: {response.status_code}"
@@ -438,7 +438,7 @@ def get_conversation_results(api_client, conversation_prompts):
                     f"{next_prompt} - {result_json.get('assistantResponse', '')}"
                 )
                 result = ConversationResultAPI(api_client, conversation_history)
-                results.append(result.as_dict())
+                results.append(result)
             else:
                 raise Exception(
                     f"Failed to continue conversation. Status code: {response.status_code}"
@@ -584,7 +584,7 @@ def get_text_similarity_results(api_client, texts):
         response = requests.post(f"{api_client.api_url}/text_similarity", params=params)
         if response.status_code == 200:
             result = TextSimilarityResultAPI(api_client, response.json()["similarity"])
-            results.append(result.as_dict())
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to calculate text similarity. Status code: {response.status_code}"
@@ -645,7 +645,7 @@ def get_keyword_extraction_results(api_client, texts):
         )
         if response.status_code == 200:
             result = KeywordExtractionResultAPI(api_client, response.json()["keywords"])
-            results.append(result.as_dict())
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract keywords. Status code: {response.status_code}"
@@ -710,7 +710,7 @@ def get_sentiment_analysis_results(api_client, texts):
             result = SentimentAnalysisResultAPI(
                 api_client, response.json()["sentiment"]
             )
-            results.append(result.as_dict())
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to analyze sentiment. Status code: {response.status_code}"
@@ -775,7 +775,7 @@ def get_named_entity_recognition_results(api_client, texts):
             result = NamedEntityRecognitionResultAPI(
                 api_client, response.json()["entities"]
             )
-            results.append(result.as_dict())
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract entities. Status code: {response.status_code}"
@@ -791,8 +791,8 @@ def get_sentiment_analysis_results(api_client, texts):
             f"{api_client.api_url}/sentiment_analysis", params=params
         )
         if response.status_code == 200:
-            result = SentimentAnalysisResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract sentiment. Status code: {response.status_code}"
@@ -808,8 +808,8 @@ def get_language_detection_results(api_client, texts):
             f"{api_client.api_url}/language_detection", params=params
         )
         if response.status_code == 200:
-            result = LanguageDetectionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to detect language. Status code: {response.status_code}"
@@ -825,8 +825,8 @@ def get_emotion_detection_results(api_client, texts):
             f"{api_client.api_url}/emotion_detection", params=params
         )
         if response.status_code == 200:
-            result = EmotionDetectionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract emotions. Status code: {response.status_code}"
@@ -842,8 +842,8 @@ def get_sentiment_detection_results(api_client, texts):
             f"{api_client.api_url}/sentiment_detection", params=params
         )
         if response.status_code == 200:
-            result = SentimentDetectionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to detect sentiment. Status code: {response.status_code}"
@@ -859,8 +859,8 @@ def get_entity_recognition_results(api_client, texts):
             f"{api_client.api_url}/entity_recognition", params=params
         )
         if response.status_code == 200:
-            result = EntityRecognitionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to recognize entities. Status code: {response.status_code}"
@@ -876,8 +876,8 @@ def get_text_classification_results(api_client, texts):
             f"{api_client.api_url}/text_classification", params=params
         )
         if response.status_code == 200:
-            result = TextClassificationResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to classify text. Status code: {response.status_code}"
@@ -893,8 +893,8 @@ def get_sentiment_analysis_results(api_client, texts):
             f"{api_client.api_url}/sentiment_analysis", params=params
         )
         if response.status_code == 200:
-            result = SentimentAnalysisResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to analyze sentiment. Status code: {response.status_code}"
@@ -910,8 +910,8 @@ def get_entity_extraction_results(api_client, texts):
             f"{api_client.api_url}/entity_extraction", params=params
         )
         if response.status_code == 200:
-            result = EntityExtractionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract entities. Status code: {response.status_code}"
@@ -927,8 +927,8 @@ def get_keywords_extraction_results(api_client, texts):
             f"{api_client.api_url}/keywords_extraction", params=params
         )
         if response.status_code == 200:
-            result = KeywordsExtractionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract keywords. Status code: {response.status_code}"
@@ -944,8 +944,8 @@ def get_category_extraction_results(api_client, texts):
             f"{api_client.api_url}/category_extraction", params=params
         )
         if response.status_code == 200:
-            result = CategoryExtractionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract categories. Status code: {response.status_code}"
@@ -961,8 +961,8 @@ def get_entity_extraction_results(api_client, texts):
             f"{api_client.api_url}/entity_extraction", params=params
         )
         if response.status_code == 200:
-            result = EntityExtractionResultAPI(response.json())
-            results.append(result.as_dict())
+            result = response.json()
+            results.append(result)
         else:
             raise Exception(
                 f"Failed to extract entities. Status code: {response.status_code}"
